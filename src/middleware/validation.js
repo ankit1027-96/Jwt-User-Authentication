@@ -1,5 +1,4 @@
 const Joi = require("joi");
-const { validate } = require("../models/User");
 
 const validateRequest = (schema) => {
   return (req, res, next) => {

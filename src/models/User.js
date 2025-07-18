@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const { default: isEmail } = require("validator/lib/isEmail");
-const e = require("express");
 
 const addressSchema = new mongoose.Schema({
   type: {
@@ -128,23 +126,22 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 // Method to increment login attempts
-userSchema.methods.incLoginAttempts = function () {
+userSchema.methods.incLoginAttempts = function() {
   // If we have a previous lock that has expired, restart at 1
   if (this.lockUntil && this.lockUntil < Date.now()) {
     return this.updateOne({
       $unset: { lockUntil: 1 },
-      $set: { loginAttempts: 1 },
+      $set: { loginAttempts: 1 }
     });
   }
-
+  
   const updates = { $inc: { loginAttempts: 1 } };
-
+  
   // Lock account after 5 failed attempts for 2 hours
   if (this.loginAttempts + 1 >= 5 && !this.isLocked) {
     updates.$set = { lockUntil: Date.now() + 2 * 60 * 60 * 1000 };
   }
-
+  
   return this.updateOne(updates);
 };
-
 module.exports = mongoose.model("User", userSchema);
