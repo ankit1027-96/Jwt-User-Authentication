@@ -120,7 +120,7 @@ const authController = {
       }
 
       // Generate tokens
-      const { accessToken, refreshToken } = generateToken(user._id);
+      const { accessToken, refreshToken } = generateTokens(user._id);
 
       // Save refresh token
       user.refreshTokens.push(refreshToken);
@@ -270,6 +270,43 @@ const authController = {
   },
 
   // Forgot password
+  forgotPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      // Generate reset token
+      const resetToken = crypto.randomBytes(32).toString("hex");
+
+      user.passwordResetToken = resetToken;
+      user.passwordResetExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+      await user.save();
+
+      // Send reset email
+      await emailService.sendPasswordResetEmail(user.email, resetToken);
+
+      res.json({
+        success: true,
+        message: "Password reset email sent",
+      });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  },
+
+  // Reset password
   resetPassword: async (req, res) => {
     try {
       const { token, newPassword } = req.body;
