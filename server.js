@@ -1,26 +1,26 @@
-const express = require("express");
-const app = express();
-const moongoose = require("mongoose");
 require("dotenv").config();
+const app = require("./src/app");
+const connectDB = require("./src/config/database");
 
-app.use(express.urlencoded({ extended: false }));
+const PORT = process.env.PORT || 3001;
 
-const connectDB = async () => {
-  try {
-    await moongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("MongoDB connected successfully");
-  } catch (error) {
-    console.error("MongoDB connection failed:", error);
-    process.exit(1);
-  }
-};
-
+// Connect DB
 connectDB();
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// Start Server
+app.listen(PORT, () => {
+  console.log(`User service running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+});
+
+// Shutdown SIGTERM termination signal by container or OS
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down gracefully...");
+  process.exit(0);
+});
+
+// SIGINT siganl interrupt when you press ctrl + c
+process.on("SIGINT", () => {
+  console.log("SIGINT received. Shutting down gracefully...");
+  process.exit(0);
 });
