@@ -41,7 +41,7 @@ const userController = {
   },
 
   // Get user address
-  getAddress: async (req, res) => {
+  getAddresses: async (req, res) => {
     try {
       const user = await User.findById(req.user._id).select("addresses");
 
