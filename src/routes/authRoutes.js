@@ -4,7 +4,7 @@ const {
   validateRequest,
   registerSchema,
   loginSchema,
-} = require("../middlware/validation");
+} = require("../middleware/validation");
 const { authenticateToken } = require("../middleware/auth");
 const rateLimit = require("express-rate-limit");
 
@@ -12,7 +12,7 @@ const router = express.Router();
 
 // Rate limit for auth routes
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 mins
+  windowMs: 10 * 60 * 1000, // 10 mins
   max: 5, // 5 attempts per window
   message: {
     success: false,
@@ -30,12 +30,29 @@ const forgotPasswordLimiter = rateLimit({
 });
 
 // Routes
-router.post("/register",validateRequest(registerSchema),authController.register);
-router.post("/login", validateRequest(loginSchema), authLimiter, authController.login);
-router.post('/refresh-token', authController.refreshToken)
-router.post('/logout', authenticateToken, authController.logout)
-router.get('/verify-email/:token', authenticateToken, authController.verifyEmail)
-router.post('forgot-password', forgotPasswordLimiter, authController.forgotPassword)
-router.post('/reset-password', authController.resetPassword)
+router.post(
+  "/register",
+  validateRequest(registerSchema),
+  authController.register
+);
+router.post(
+  "/login",
+  validateRequest(loginSchema),
+  authLimiter,
+  authController.login
+);
+router.post("/refresh-token", authController.refreshToken);
+router.post("/logout", authenticateToken, authController.logout);
+router.get(
+  "/verify-email/:token",
+  authenticateToken,
+  authController.verifyEmail
+);
+router.post(
+  "/forgot-password",
+  forgotPasswordLimiter,
+  authController.forgotPassword
+);
+router.post("/reset-password", authController.resetPassword);
 
-module.exports = router
+module.exports = router;

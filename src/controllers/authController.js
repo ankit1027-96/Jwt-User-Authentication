@@ -214,20 +214,32 @@ const authController = {
     try {
       const { refreshToken } = req.body;
 
-      if (refreshToken) {
-        const user = await user.findById(req.user._id);
-        user.refreshToken = user.refreshTokens.filter(
-          (token) => token !== refreshToken
-        );
-        await user.save();
+      if (!refreshToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Refresh token required",
+        });
       }
+
+      const user = await User.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
+      user.refreshTokens = user.refreshTokens.filter(
+        (token) => token !== refreshToken
+      );
+      await user.save();
 
       res.json({
         success: true,
         message: "Logout successful",
       });
     } catch (error) {
-      console.error("Logout", error);
+      console.error("Logout error:", error);
       res.status(500).json({
         success: false,
         message: "Internal server error",
@@ -306,7 +318,7 @@ const authController = {
     }
   },
 
-  // Reset password
+  // Reset password when user click the link in email 
   resetPassword: async (req, res) => {
     try {
       const { token, newPassword } = req.body;

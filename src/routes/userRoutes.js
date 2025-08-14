@@ -33,7 +33,7 @@ router.put(
   validateRequest(addAddressSchema),
   userController.updateAddress
 );
-router.delete("/addressses/:addressId", userController.deleteAddress);
+router.delete("/addresses/:addressId", userController.deleteAddress);
 
 // Password and account management
 router.put(
@@ -46,6 +46,7 @@ router.put(
   ),
   userController.changePassword
 );
+
 router.put("/deactivate", userController.deactivateAccount);
 
-module.exports = router
+module.exports = router;

@@ -43,7 +43,7 @@ const updateProfileSchema = Joi.object({
   gender: Joi.string().valid("male", "female", "other").optional(),
 });
 
-const addAddressSchema = Joi.object()({
+const addAddressSchema = Joi.object({
   type: Joi.string().valid("home", "work", "other"),
   firstName: Joi.string().min(2).max(20).required(),
   lastName: Joi.string().min(2).max(20).required(),

@@ -90,7 +90,7 @@ const userController = {
   updateAddress: async (req, res) => {
     try {
       const { addressId } = req.params;
-      const user = await User.findById(req.user._Id);
+      const user = await User.findById(req.user._id);
       const address = user.addresses.id(addressId);
 
       if (!address) {
@@ -137,7 +137,7 @@ const userController = {
           message: "Address not found",
         });
       }
-      address.remove();
+      address.deleteOne();
       await user.save();
 
       res.json({
@@ -157,34 +157,32 @@ const userController = {
   changePassword: async (req, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
-
-      const user = await User.findById(req.user._id);
-
+      
+      const user = await User.findById(req.user._id).select('+password');
+      
       // Verify current password
-      const isCurrentPasswordValid = await user.comparePassword(
-        currentPassword
-      );
-      if (!currentPassword) {
+      const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+      if (!isCurrentPasswordValid) {
         return res.status(400).json({
           success: false,
-          message: "Current password is incorrect",
+          message: 'Current password is incorrect'
         });
       }
-
-      // update password
+      
+      // Update password
       user.password = newPassword;
-      user.refreshTokens = []; // invalidate all refresh tokens
+      user.refreshTokens = []; // Invalidate all refresh tokens
       await user.save();
-
+      
       res.json({
         success: true,
-        message: "Password changed successfully",
+        message: 'Password changed successfully'
       });
     } catch (error) {
-      console.error("Password change error", error);
+      console.error('Change password error:', error);
       res.status(500).json({
         success: false,
-        message: "Internal server error",
+        message: 'Internal server error'
       });
     }
   },
@@ -195,7 +193,7 @@ const userController = {
       const user = await User.findById(req.user._id);
       user.isActive = false;
       user.refreshTokens = []; // invalidate all refersh tokens
-      await User.save();
+      await user.save();
 
       res.json({
         success: true,

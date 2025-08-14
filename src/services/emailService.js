@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const { prependOnceListener } = require("../models/User");
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -12,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const emailService = {
-  sendVerficationEmail: async (email, token) => {
+  sendVerificationEmail: async (email, token) => {
     const verficationUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`;
 
     const mailoption = {
@@ -25,7 +24,7 @@ const emailService = {
         <a> href="${verficationUrl}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
         <p>This will expire in 24 hours.</p>
         <p>If you didn't create an account, please ignore this email.</p>
-        `
+        `,
     };
 
     await transporter.sendMail(mailoption);
@@ -43,7 +42,7 @@ const emailService = {
         <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
         <p>This link will expire in 1 hour.</p>
         <p>If you didn't request this, please ignore this email.</p>
-        `
+        `,
     };
 
     await transporter.sendMail(mailoption);

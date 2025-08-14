@@ -39,7 +39,7 @@ app.get("/health", (req, res) => {
   res.json({
     success: true,
     message: "User service is healthy",
-    timeStamp: new Date.now().toISOString(),
+    timeStamp: new Date().toISOString(),
   });
 });
 
@@ -48,7 +48,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 
 // 404 handler
-app.use("*", (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "Route not found",
